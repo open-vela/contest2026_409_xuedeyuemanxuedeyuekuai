@@ -1,0 +1,141 @@
+<style>
+  .watchface {
+    width: 480px;
+    height: 480px;
+    background-color: #000000;
+    justify-content: center;
+    align-items: center;
+  }
+  .dial-bg {
+    width: 400px;
+    height: 400px;
+  }
+  .time-display {
+    position: absolute;
+    top: 180px;
+    left: 140px;
+    flex-direction: column;
+    align-items: center;
+  }
+  .time-text {
+    color: #ffffff;
+    font-size: 48px;
+    font-weight: bold;
+  }
+  .date-text {
+    color: #94a3b8;
+    font-size: 16px;
+    margin-top: 4px;
+  }
+  .status-bar {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    flex-direction: row;
+  }
+  .status-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+  }
+  .hr-display {
+    position: absolute;
+    bottom: 80px;
+    left: 180px;
+    flex-direction: row;
+    align-items: center;
+  }
+  .hr-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+  }
+  .hr-text {
+    color: #ef4444;
+    font-size: 18px;
+  }
+  .back-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 200px;
+    width: 80px;
+    height: 36px;
+    border-radius: 18px;
+    background-color: #1e293b;
+    justify-content: center;
+    align-items: center;
+  }
+  .back-text {
+    color: #94a3b8;
+    font-size: 14px;
+  }
+</style>
+
+<template>
+  <div class="watchface">
+    <!-- 表盘背景 -->
+    <image class="dial-bg" src="/common/image/clock_simple_bg.png"></image>
+    
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <image class="status-icon" src="/common/image/bluetooth.png"></image>
+      <image class="status-icon" src="/common/image/img_alarm.png"></image>
+    </div>
+    
+    <!-- 时间显示 -->
+    <div class="time-display">
+      <text class="time-text">{{timeStr}}</text>
+      <text class="date-text">{{dateStr}}</text>
+    </div>
+    
+    <!-- 心率显示 -->
+    <div class="hr-display">
+      <image class="hr-icon" src="/common/image/img_red_heart.png"></image>
+      <text class="hr-text">{{heartRate}} bpm</text>
+    </div>
+    
+    <!-- 返回按钮 -->
+    <div class="back-btn" onclick="goBack">
+      <text class="back-text">返回</text>
+    </div>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      timeStr: '00:00',
+      dateStr: '2026-08-27',
+      heartRate: '72',
+      _timer: null
+    },
+
+    onReady() {
+      this.updateTime();
+      this._timer = setInterval(() => {
+        this.updateTime();
+      }, 1000);
+    },
+
+    onDestroy() {
+      if (this._timer) clearInterval(this._timer);
+    },
+
+    updateTime() {
+      var now = new Date();
+      var h = now.getHours();
+      var m = now.getMinutes();
+      var s = now.getSeconds();
+      this.timeStr = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+      
+      var year = now.getFullYear();
+      var month = now.getMonth() + 1;
+      var day = now.getDate();
+      this.dateStr = year + '-' + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
+    },
+
+    goBack() {
+      this.$router.back();
+    }
+  };
+</script>

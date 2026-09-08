@@ -1,0 +1,16 @@
+{
+  "name": "beatpulse",
+  "version": "1.0.0",
+  "description": "BeatPulse - 手表节奏游戏，体感+心率联动",
+  "scripts": {
+    "build": "node node_modules/hap-toolkit/bin/index.js build",
+    "watch": "node node_modules/hap-toolkit/bin/index.js watch"
+  },
+  "devDependencies": {
+    "aiot-toolkit": "^2.0.5",
+    "hap-toolkit": "latest"
+  },
+  "browserslist": [
+    "chrome 65"
+  ]
+}

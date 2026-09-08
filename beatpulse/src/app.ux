@@ -1,0 +1,20 @@
+<script>
+  export default {
+    onCreate() {
+      console.log('[BeatPulse] App created');
+    },
+    onDestroy() {
+      console.log('[BeatPulse] App destroyed');
+    },
+    // 全局数据：游戏配置 & 跨页面共享
+    globalData: {
+      difficulty: 1,        // 难度等级 1-5
+      lastScore: 0,
+      lastCombo: 0,
+      bestScore: 0,
+      heartRate: 72,        // 实时心率
+      bpm: 120,             // 游戏BPM
+      totalGames: 0
+    }
+  };
+</script>

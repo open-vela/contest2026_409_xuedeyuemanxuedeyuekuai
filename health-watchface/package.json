@@ -1,0 +1,12 @@
+{
+  "name": "health-watchface",
+  "version": "1.0.0",
+  "description": "openvela 手表健康仪表盘 - 实时心率/血氧/压力监控",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production node node_modules/hap-toolkit/bin/index.js build",
+    "watch": "node node_modules/hap-toolkit/bin/index.js watch"
+  },
+  "devDependencies": {
+    "hap-toolkit": "latest"
+  }
+}

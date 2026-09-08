@@ -1,0 +1,244 @@
+<style>
+  .page { width: 480px; height: 480px; background-color: #000000; position: relative; overflow: hidden; }
+  
+  /* 开机 */
+  .boot { width: 480px; height: 480px; flex-direction: column; align-items: center; justify-content: center; }
+  .boot-logo { color: #06b6d4; font-size: 52px; font-weight: bold; letter-spacing: 4px; }
+  .boot-sub { color: #64748b; font-size: 16px; margin-top: 8px; }
+  
+  /* 表盘容器 */
+  .face-wrap { width: 480px; height: 480px; position: relative; }
+  .face { width: 480px; height: 480px; position: absolute; top: 0; left: 0; }
+  .face-bg { width: 480px; height: 480px; position: absolute; top: 0; left: 0; }
+  
+  /* 信息叠加层 */
+  .info-layer { position: absolute; width: 480px; height: 480px; top: 0; left: 0; }
+  .top-bar { position: absolute; top: 20px; left: 30px; flex-direction: row; align-items: center; }
+  .top-icon { width: 28px; height: 28px; margin-right: 10px; }
+  .top-time { position: absolute; top: 20px; right: 30px; color: #94a3b8; font-size: 16px; }
+  .center-time { position: absolute; top: 180px; left: 130px; flex-direction: column; align-items: center; }
+  .center-hm { color: #ffffff; font-size: 52px; font-weight: bold; letter-spacing: 2px; }
+  .center-sec { color: #06b6d4; font-size: 24px; margin-top: -4px; }
+  .center-date { color: #94a3b8; font-size: 16px; margin-top: 6px; }
+  .bottom-bar { position: absolute; bottom: 30px; left: 0; width: 480px; flex-direction: row; justify-content: space-around; }
+  .bottom-card { width: 90px; height: 50px; border-radius: 12px; background-color: rgba(30,41,59,0.8); flex-direction: column; align-items: center; justify-content: center; }
+  .bottom-val { color: #f8fafc; font-size: 16px; font-weight: bold; }
+  .bottom-lbl { color: #64748b; font-size: 10px; margin-top: 2px; }
+  
+  /* 米奇表盘 */
+  .mickey-wrap { width: 480px; height: 480px; position: relative; }
+  .mickey-head { position: absolute; top: 60px; left: 134px; width: 211px; height: 182px; }
+  .mickey-body { position: absolute; top: 200px; left: 112px; width: 257px; height: 219px; }
+  .mickey-time { position: absolute; top: 340px; left: 140px; flex-direction: column; align-items: center; }
+  
+  /* 数字表盘 */
+  .digi-bg { width: 480px; height: 480px; position: absolute; top: 0; left: 0; }
+  .digi-time-row { position: absolute; top: 170px; left: 60px; flex-direction: row; align-items: center; }
+  .digi-num { width: 55px; height: 75px; }
+  .digi-colon { color: #06b6d4; font-size: 48px; font-weight: bold; margin-left: 6px; margin-right: 6px; }
+  .digi-date { position: absolute; top: 270px; left: 170px; color: #94a3b8; font-size: 18px; }
+  .digi-week { position: absolute; top: 300px; left: 200px; color: #64748b; font-size: 14px; }
+  
+  /* 运动表盘 */
+  .sport-bg { width: 480px; height: 480px; position: absolute; top: 0; left: 0; }
+  .sport-center { position: absolute; top: 180px; left: 140px; flex-direction: column; align-items: center; }
+  .sport-steps { color: #f8fafc; font-size: 42px; font-weight: bold; }
+  .sport-label { color: #64748b; font-size: 14px; margin-top: 4px; }
+  .sport-row { position: absolute; bottom: 60px; left: 60px; flex-direction: row; }
+  .sport-item { flex-direction: column; align-items: center; margin-right: 50px; }
+  .sport-val { color: #f8fafc; font-size: 20px; font-weight: bold; }
+  .sport-lbl { color: #64748b; font-size: 11px; margin-top: 2px; }
+  
+  /* 表盘选择器 */
+  .selector { width: 480px; height: 480px; flex-direction: column; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.92); }
+  .sel-title { color: #f8fafc; font-size: 20px; font-weight: bold; margin-bottom: 24px; }
+  .sel-row { flex-direction: row; align-items: center; justify-content: center; }
+  .sel-item { width: 100px; height: 100px; border-radius: 16px; border-width: 3px; border-color: #1e293b; margin: 10px; justify-content: center; align-items: center; background-color: #0f172a; }
+  .sel-active { border-color: #06b6d4; }
+  .sel-name { color: #f8fafc; font-size: 14px; margin-top: 6px; }
+  .sel-preview { width: 60px; height: 60px; border-radius: 8px; }
+  .sel-hint { color: #475569; font-size: 13px; margin-top: 24px; }
+  
+  /* Dock */
+  .dock { position: absolute; bottom: 0; left: 0; width: 480px; height: 80px; flex-direction: row; justify-content: space-around; align-items: center; background-color: rgba(0,0,0,0.85); }
+  .dock-item { flex-direction: column; align-items: center; }
+  .dock-icon { width: 44px; height: 44px; border-radius: 22px; background-color: #1e293b; justify-content: center; align-items: center; }
+  .dock-label { color: #94a3b8; font-size: 10px; margin-top: 3px; }
+</style>
+
+<template>
+  <div class="page">
+    <!-- 开机 -->
+    <div class="boot" if="{{s === 'boot'}}">
+      <text class="boot-logo">BeatPulse</text>
+      <text class="boot-sub">智能手表</text>
+    </div>
+
+    <!-- 表盘 -->
+    <div class="face-wrap" if="{{s === 'face'}}" onclick="tap" onlongpress="longpress">
+
+      <!-- 表盘1: 经典 -->
+      <div class="face" if="{{f === 0}}">
+        <image class="face-bg" src="/common/image/clock_simple_bg.png"></image>
+        <div class="info-layer">
+          <div class="top-bar">
+            <image class="top-icon" src="/common/image/bluetooth.png"></image>
+            <image class="top-icon" src="/common/image/wt_sunny.png"></image>
+          </div>
+          <text class="top-time">{{secStr}}</text>
+          <div class="center-time">
+            <text class="center-hm">{{hm}}</text>
+            <text class="center-sec">{{ss}}</text>
+            <text class="center-date">{{dateStr}}</text>
+          </div>
+          <div class="bottom-bar">
+            <div class="bottom-card">
+              <text class="bottom-val">{{hr}}</text>
+              <text class="bottom-lbl">心率</text>
+            </div>
+            <div class="bottom-card">
+              <text class="bottom-val">{{steps}}</text>
+              <text class="bottom-lbl">步数</text>
+            </div>
+            <div class="bottom-card">
+              <text class="bottom-val">26°C</text>
+              <text class="bottom-lbl">温度</text>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表盘2: 米奇 -->
+      <div class="face" if="{{f === 1}}">
+        <div class="mickey-wrap">
+          <image class="face-bg" src="/common/image/clock_mickey_bg.png"></image>
+          <image class="mickey-head" src="/common/image/clock_mickey_head.png"></image>
+          <image class="mickey-body" src="/common/image/clock_mickey_body.png"></image>
+          <div class="mickey-time">
+            <text style="color:#ffffff; font-size:36px; font-weight:bold;">{{hm}}</text>
+            <text style="color:#94a3b8; font-size:14px; margin-top:4px;">{{dateStr}}</text>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表盘3: 数字 -->
+      <div class="face" if="{{f === 2}}">
+        <image class="digi-bg" src="/common/image/clock_digital_bg.png"></image>
+        <div class="digi-time-row">
+          <image class="digi-num" src="/common/image/digital_b_time_{{h1}}.png"></image>
+          <image class="digi-num" src="/common/image/digital_b_time_{{h2}}.png"></image>
+          <text class="digi-colon">:</text>
+          <image class="digi-num" src="/common/image/digital_b_time_{{m1}}.png"></image>
+          <image class="digi-num" src="/common/image/digital_b_time_{{m2}}.png"></image>
+        </div>
+        <text class="digi-date">{{dateStr}}</text>
+        <text class="digi-week">{{wk}}</text>
+      </div>
+
+      <!-- 表盘4: 运动 -->
+      <div class="face" if="{{f === 3}}">
+        <image class="sport-bg" src="/common/image/clock_rotate_bg_bg.png"></image>
+        <div class="sport-center">
+          <text class="sport-steps">{{steps}}</text>
+          <text class="sport-label">今日步数</text>
+        </div>
+        <div class="sport-row">
+          <div class="sport-item">
+            <text class="sport-val">{{cal}}</text>
+            <text class="sport-lbl">千卡</text>
+          </div>
+          <div class="sport-item">
+            <text class="sport-val">{{dist}}</text>
+            <text class="sport-lbl">公里</text>
+          </div>
+          <div class="sport-item">
+            <text class="sport-val">{{hr}}</text>
+            <text class="sport-lbl">心率</text>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dock -->
+      <div class="dock" if="{{dock}}">
+        <div class="dock-item"><div class="dock-icon"><text style="color:#fbbf24; font-size:20px;">♪</text></div><text class="dock-label">游戏</text></div>
+        <div class="dock-item"><div class="dock-icon"><text style="color:#ef4444; font-size:20px;">♥</text></div><text class="dock-label">健康</text></div>
+        <div class="dock-item"><div class="dock-icon"><text style="color:#60a5fa; font-size:20px;">☁</text></div><text class="dock-label">天气</text></div>
+        <div class="dock-item"><div class="dock-icon"><text style="color:#94a3b8; font-size:20px;">⚙</text></div><text class="dock-label">设置</text></div>
+      </div>
+    </div>
+
+    <!-- 选择器 -->
+    <div class="selector" if="{{s === 'select'}}">
+      <text class="sel-title">选择表盘</text>
+      <div class="sel-row">
+        <div class="sel-item {{f===0?'sel-active':''}}" onclick="pick(0)">
+          <image class="sel-preview" src="/common/image/clock_simple_bg.png"></image>
+          <text class="sel-name">经典</text>
+        </div>
+        <div class="sel-item {{f===1?'sel-active':''}}" onclick="pick(1)">
+          <image class="sel-preview" src="/common/image/clock_mickey_head.png"></image>
+          <text class="sel-name">米奇</text>
+        </div>
+        <div class="sel-item {{f===2?'sel-active':''}}" onclick="pick(2)">
+          <image class="sel-preview" src="/common/image/clock_digital_bg.png"></image>
+          <text class="sel-name">数字</text>
+        </div>
+        <div class="sel-item {{f===3?'sel-active':''}}" onclick="pick(3)">
+          <image class="sel-preview" src="/common/image/clock_rotate_bg_bg.png"></image>
+          <text class="sel-name">运动</text>
+        </div>
+      </div>
+      <text class="sel-hint">点击选择 · 空白处退出</text>
+    </div>
+  </div>
+</template>
+
+<script>
+  var W = ['周日','周一','周二','周三','周四','周五','周六'];
+  var lp = null;
+
+  export default {
+    data: {
+      s: 'boot', f: 0, dock: false,
+      hm: '00:00', ss: '00', secStr: '', dateStr: '', wk: '',
+      hr: '72', steps: '8,642', cal: '326', dist: '5.2',
+      h1:'0', h2:'0', m1:'0', m2:'0'
+    },
+
+    onReady() {
+      var self = this;
+      setTimeout(function() { self.s = 'face'; self.go(); }, 1200);
+    },
+
+    go() {
+      var self = this;
+      this.tick();
+      setInterval(function() { self.tick(); }, 1000);
+    },
+
+    tick() {
+      var n = new Date();
+      var h = n.getHours(), m = n.getMinutes(), s = n.getSeconds();
+      this.hm = (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+      this.ss = (s<10?'0':'')+s;
+      this.secStr = (s<10?'0':'')+s+'s';
+      this.h1=''+Math.floor(h/10); this.h2=''+(h%10);
+      this.m1=''+Math.floor(m/10); this.m2=''+(m%10);
+      var y=n.getFullYear(),mo=n.getMonth()+1,d=n.getDate();
+      this.dateStr=y+'/'+(mo<10?'0':'')+mo+'/'+(d<10?'0':'')+d;
+      this.wk=W[n.getDay()];
+      this.hr=''+(68+Math.floor(Math.random()*15));
+    },
+
+    tap() { if(this.s==='select'){this.s='face';return;} this.dock=!this.dock; },
+
+    longpress() {
+      var self=this;
+      if(lp)clearTimeout(lp);
+      lp=setTimeout(function(){self.s='select';self.dock=false;},800);
+    },
+
+    pick(i){ this.f=i; this.s='face'; this.dock=true; }
+  };
+</script>
+

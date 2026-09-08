@@ -1,0 +1,48 @@
+{
+  "package": "com.contest.beatpulse",
+  "name": "BeatPulse",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "/common/image/icon.png",
+  "deviceTypeList": ["watch"],
+  "features": [
+    { "name": "system.prompt" },
+    { "name": "system.vibrator" },
+    { "name": "system.battery" },
+    { "name": "system.sensor" },
+    { "name": "service.health" }
+  ],
+  "permissions": [
+    { "name": "hapjs.permission.HEALTH" }
+  ],
+  "config": {
+    "designWidth": 480,
+    "background": {
+      "features": ["service.health"]
+    }
+  },
+  "router": {
+    "entry": "pages/index",
+    "pages": {
+      "pages/index": {
+        "component": "index"
+      },
+      "pages/game": {
+        "component": "game"
+      },
+      "pages/result": {
+        "component": "result"
+      },
+      "pages/watchface": {
+        "component": "watchface"
+      }
+    }
+  },
+  "display": {
+    "titleBar": false,
+    "menu": false,
+    "fullScreen": true,
+    "backgroundColor": "#000000"
+  }
+}

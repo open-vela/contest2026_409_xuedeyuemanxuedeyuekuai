@@ -1,0 +1,206 @@
+<style>
+  .result-container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 480px;
+    height: 480px;
+    background-color: #000000;
+  }
+
+  /* ===== 结果标题 ===== */
+  .result-title {
+    color: #f8fafc;
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 30px;
+  }
+  .result-subtitle {
+    color: #64748b;
+    font-size: 16px;
+    margin-top: 6px;
+  }
+
+  /* ===== 分数展示 ===== */
+  .score-area {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .score-value {
+    color: #06b6d4;
+    font-size: 72px;
+    font-weight: bold;
+  }
+  .score-label {
+    color: #94a3b8;
+    font-size: 16px;
+    margin-top: -4px;
+  }
+
+  /* ===== 统计数据 ===== */
+  .stats-row {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 380px;
+    margin-top: 24px;
+  }
+  .stat-item {
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+  }
+  .stat-value {
+    color: #f8fafc;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .stat-label {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .stat-hr {
+    color: #ef4444;
+  }
+  .stat-combo {
+    color: #fbbf24;
+  }
+  .stat-time {
+    color: #a855f7;
+  }
+
+  /* ===== 新纪录 ===== */
+  .new-record {
+    color: #fbbf24;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 16px;
+  }
+
+  /* ===== 按钮区 ===== */
+  .btn-row {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+  }
+  .btn-retry {
+    width: 120px;
+    height: 48px;
+    border-radius: 24px;
+    background-color: #06b6d4;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+  }
+  .btn-home {
+    width: 120px;
+    height: 48px;
+    border-radius: 24px;
+    background-color: #1e293b;
+    justify-content: center;
+    align-items: center;
+    border-width: 1px;
+    border-color: #334155;
+  }
+  .btn-text-retry {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .btn-text-home {
+    color: #e2e8f0;
+    font-size: 18px;
+  }
+</style>
+
+<template>
+  <div class="result-container">
+    <text class="result-title">游戏结束</text>
+    <text class="result-subtitle">{{resultMsg}}</text>
+
+    <!-- 分数 -->
+    <div class="score-area">
+      <text class="score-value">{{score}}</text>
+      <text class="score-label">SCORE</text>
+    </div>
+
+    <!-- 新纪录 -->
+    <text class="new-record" if="{{isNewRecord}}">★ NEW RECORD ★</text>
+
+    <!-- 统计 -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <text class="stat-value stat-combo">{{maxCombo}}</text>
+        <text class="stat-label">最大连击</text>
+      </div>
+      <div class="stat-item">
+        <text class="stat-value stat-hr">{{avgHR}}</text>
+        <text class="stat-label">平均心率</text>
+      </div>
+      <div class="stat-item">
+        <text class="stat-value stat-time">{{duration}}</text>
+        <text class="stat-label">用时</text>
+      </div>
+    </div>
+
+    <!-- 按钮 -->
+    <div class="btn-row">
+      <div class="btn-retry" onclick="retry">
+        <text class="btn-text-retry">再来</text>
+      </div>
+      <div class="btn-home" onclick="goHome">
+        <text class="btn-text-home">首页</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      score: 0,
+      maxCombo: 0,
+      avgHR: '--',
+      duration: '0:00',
+      isNewRecord: false,
+      resultMsg: ''
+    },
+
+    onReady() {
+      const gd = this.$app.$def.globalData;
+      this.score = gd.lastScore || 0;
+      this.maxCombo = gd.lastCombo || 0;
+      this.avgHR = String(gd.heartRate || 72);
+
+      // 计算用时
+      const sec = Math.floor((gd.lastDuration || 0) / 1000);
+      const min = Math.floor(sec / 60);
+      const s = sec % 60;
+      this.duration = `${min}:${String(s).padStart(2, '0')}`;
+
+      // 判断新纪录
+      if (this.score > (gd.bestScore || 0)) {
+        gd.bestScore = this.score;
+        this.isNewRecord = true;
+      }
+
+      gd.totalGames = (gd.totalGames || 0) + 1;
+
+      // 评语
+      if (this.score >= 5000) this.resultMsg = '节奏大师！';
+      else if (this.score >= 3000) this.resultMsg = '非常出色！';
+      else if (this.score >= 1000) this.resultMsg = '表现不错！';
+      else this.resultMsg = '继续练习！';
+    },
+
+    retry() {
+      this.$router.replace({ uri: '/pages/game' });
+    },
+
+    goHome() {
+      this.$router.replace({ uri: '/pages/index' });
+    }
+  };
+</script>

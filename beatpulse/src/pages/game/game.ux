@@ -1,0 +1,329 @@
+<style>
+  .game-container {
+    width: 480px;
+    height: 480px;
+    background-color: #000000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-text {
+    color: #f8fafc;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  .combo-text {
+    color: #06b6d4;
+    font-size: 18px;
+    margin-top: 5px;
+  }
+  .judgment-text {
+    color: #fbbf24;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  .target-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    border-width: 4px;
+    border-color: #1e293b;
+    position: absolute;
+    top: 180px;
+    left: 180px;
+  }
+  .target-glow {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    border-width: 2px;
+    border-color: #06b6d4;
+    position: absolute;
+    top: 180px;
+    left: 180px;
+    opacity: 0.4;
+  }
+  .hit-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    border-width: 3px;
+    border-color: #06b6d4;
+    position: absolute;
+    top: 180px;
+    left: 180px;
+    opacity: 0;
+  }
+  .note {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    position: absolute;
+  }
+  .info-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 400px;
+    position: absolute;
+    top: 20px;
+  }
+  .info-text {
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  .hr-text {
+    color: #ef4444;
+    font-size: 14px;
+  }
+  .fps-text {
+    color: #334155;
+    font-size: 12px;
+    position: absolute;
+    top: 20px;
+    left: 220px;
+  }
+  .exit-hint {
+    color: #334155;
+    font-size: 12px;
+    position: absolute;
+    bottom: 20px;
+  }
+</style>
+
+<template>
+  <div class="game-container" onclick="onTap">
+    <!-- 信息栏 -->
+    <div class="info-bar">
+      <text class="hr-text">♥ {{heartRate}}</text>
+      <text class="info-text">{{timeStr}}</text>
+    </div>
+    <text class="fps-text">{{fps}}fps</text>
+
+    <!-- 判定圈 -->
+    <div class="target-ring"></div>
+    <div class="target-glow"></div>
+    <div class="hit-ring" style="opacity: {{hitAlpha}};"></div>
+
+    <!-- 音符容器 -->
+    <div for="{{notes}}" class="note" style="left: {{$item.x}}px; top: {{$item.y}}px; background-color: {{$item.color}};"></div>
+
+    <!-- 分数 -->
+    <text class="score-text">{{score}}</text>
+    <text class="combo-text" if="{{combo > 1}}">{{combo}} COMBO</text>
+    <text class="judgment-text">{{judgment}}</text>
+
+    <!-- 退出提示 -->
+    <text class="exit-hint">点击判定圈得分</text>
+  </div>
+</template>
+
+<script>
+  import vibrator from "@system.vibrator";
+
+  const W = 480;
+  const H = 480;
+  const CX = W / 2;
+  const CY = H / 2;
+  const TARGET_R = 60;
+  const NOTE_SPAWN_R = 200;
+  const NOTE_SIZE = 36;
+  const PERFECT_WINDOW = 25;
+  const GOOD_WINDOW = 45;
+
+  const COLORS = ['#fbbf24', '#06b6d4', '#a855f7', '#ef4444', '#4ade80'];
+
+  let gameRunning = false;
+  let score = 0;
+  let combo = 0;
+  let maxCombo = 0;
+  let beatTimer = null;
+  let animFrame = null;
+  let noteIdCounter = 0;
+  let startTime = 0;
+  let fps = 0;
+  let frameCount = 0;
+  let lastFpsTime = 0;
+
+  export default {
+    data: {
+      score: 0,
+      combo: 0,
+      judgment: '',
+      heartRate: '72',
+      timeStr: '0:00',
+      fps: 0,
+      hitAlpha: 0,
+      notes: []
+    },
+
+    onReady() {
+      console.log('[Game] onReady');
+      setTimeout(() => {
+        this.initGame();
+      }, 300);
+    },
+
+    onDestroy() {
+      this.stopGame();
+    },
+
+    initGame() {
+      const gd = this.$app.$def.globalData;
+      this.heartRate = String(gd.heartRate || 72);
+      
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      noteIdCounter = 0;
+      startTime = Date.now();
+      this.score = 0;
+      this.combo = 0;
+      this.judgment = '';
+      this.notes = [];
+      this.hitAlpha = 0;
+
+      gameRunning = true;
+      lastFpsTime = Date.now();
+
+      const interval = Math.max(300, 800 - (gd.difficulty || 1) * 100);
+      beatTimer = setInterval(() => {
+        if (gameRunning) this.spawnNote();
+      }, interval);
+
+      this.gameLoop();
+    },
+
+    gameLoop() {
+      if (!gameRunning) return;
+      
+      const now = Date.now();
+      frameCount++;
+      if (now - lastFpsTime >= 1000) {
+        fps = frameCount;
+        this.fps = fps;
+        frameCount = 0;
+        lastFpsTime = now;
+      }
+
+      const sec = Math.floor((now - startTime) / 1000);
+      const min = Math.floor(sec / 60);
+      const s = sec % 60;
+      this.timeStr = min + ':' + String(s).padStart(2, '0');
+
+      this.updateNotes();
+      this.hitAlpha *= 0.9;
+
+      animFrame = setTimeout(() => {
+        this.gameLoop();
+      }, 16);
+    },
+
+    updateNotes() {
+      const updated = [];
+      for (const n of this.notes) {
+        const dx = CX - n.x;
+        const dy = CY - n.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > 5) {
+          const speed = 2.5;
+          n.x += (dx / dist) * speed;
+          n.y += (dy / dist) * speed;
+          n.dist = dist;
+          updated.push(n);
+        }
+      }
+      this.notes = updated;
+    },
+
+    spawnNote() {
+      if (!gameRunning) return;
+      
+      const angle = Math.random() * Math.PI * 2;
+      const x = CX + Math.cos(angle) * NOTE_SPAWN_R;
+      const y = CY + Math.sin(angle) * NOTE_SPAWN_R;
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+      const newNote = {
+        id: noteIdCounter++,
+        x: x - NOTE_SIZE / 2,
+        y: y - NOTE_SIZE / 2,
+        color: color,
+        dist: NOTE_SPAWN_R
+      };
+
+      this.notes = [...this.notes, newNote];
+    },
+
+    onTap(e) {
+      if (!gameRunning) return;
+
+      const tx = e.touches[0].localX;
+      const ty = e.touches[0].localY;
+
+      let closestIdx = -1;
+      let closestDist = Infinity;
+
+      for (let i = 0; i < this.notes.length; i++) {
+        const n = this.notes[i];
+        const nx = n.x + NOTE_SIZE / 2;
+        const ny = n.y + NOTE_SIZE / 2;
+        const distToCenter = Math.sqrt((nx - CX) ** 2 + (ny - CY) ** 2);
+        const distToTap = Math.sqrt((nx - tx) ** 2 + (ny - ty) ** 2);
+
+        if (distToCenter < TARGET_R + 50 && distToTap < 60) {
+          if (distToTap < closestDist) {
+            closestDist = distToTap;
+            closestIdx = i;
+          }
+        }
+      }
+
+      if (closestIdx >= 0) {
+        const n = this.notes[closestIdx];
+        const nx = n.x + NOTE_SIZE / 2;
+        const ny = n.y + NOTE_SIZE / 2;
+        const distFromCenter = Math.sqrt((nx - CX) ** 2 + (ny - CY) ** 2);
+        const error = Math.abs(distFromCenter - TARGET_R);
+
+        if (error < PERFECT_WINDOW) {
+          this.onHit('PERFECT!', 300);
+        } else if (error < GOOD_WINDOW) {
+          this.onHit('GOOD', 100);
+        } else {
+          this.onHit('OK', 50);
+        }
+
+        const newNotes = [...this.notes];
+        newNotes.splice(closestIdx, 1);
+        this.notes = newNotes;
+      }
+    },
+
+    onHit(type, baseScore) {
+      combo++;
+      if (combo > maxCombo) maxCombo = combo;
+
+      const comboMul = 1 + Math.floor(combo / 10) * 0.5;
+      const addScore = Math.round(baseScore * comboMul);
+      score += addScore;
+      this.score = score;
+      this.combo = combo;
+      this.judgment = type;
+      this.hitAlpha = 0.8;
+
+      try {
+        vibrator.vibrate({ mode: 'short' });
+      } catch (e) {}
+    },
+
+    stopGame() {
+      gameRunning = false;
+      if (beatTimer) clearInterval(beatTimer);
+      if (animFrame) clearTimeout(animFrame);
+    }
+  };
+</script>
+

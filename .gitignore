@@ -1,0 +1,34 @@
+# Build outputs
+*.bin
+*.o
+*.d
+*.map
+*.elf
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*.tmp
+
+# Node modules
+node_modules/
+
+# ROMFS backups
+romfs_removed_backup.tar.gz
+
+# Downloaded templates
+*.docx

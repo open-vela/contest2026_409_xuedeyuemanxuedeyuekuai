@@ -1,0 +1,445 @@
+<style>
+#honey-demo {
+  --ink: #f4f7fb;
+  --muted: #8c9bad;
+  --line: rgba(255,255,255,.11);
+  --cyan: #73e6ff;
+  --green: #81e6a8;
+  --orange: #ffb36b;
+  max-width: 1040px;
+  margin: 0 auto;
+  color: #15202a;
+}
+
+#honey-demo .demo-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+#honey-demo h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: 0;
+  color: #15202a;
+}
+
+#honey-demo .subtitle {
+  margin: 0;
+  color: #657483;
+}
+
+#honey-demo .demo-badge {
+  border: 1px solid rgba(115,230,255,.32);
+  color: #087d99;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#honey-demo .demo-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 390px) minmax(260px, 1fr);
+  gap: 26px;
+  align-items: center;
+}
+
+#honey-demo .watch-shell {
+  width: min(390px, 100%);
+  aspect-ratio: 390 / 450;
+  margin: 0 auto;
+  padding: 9px;
+  border: 1px solid #2b3645;
+  border-radius: 50px;
+  background: #0d131c;
+  box-shadow: 0 22px 60px rgba(0,0,0,.38), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+#honey-demo .watch-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 42px;
+  background: #070b11;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+
+#honey-demo .watch-screen.dragging { cursor: grabbing; }
+
+#honey-demo .screen-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 49%, rgba(56,102,128,.18), transparent 44%), linear-gradient(180deg, rgba(255,255,255,.025), transparent 28%);
+}
+
+#honey-demo .screen-top {
+  position: absolute;
+  z-index: 20;
+  inset: 18px 18px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #a8b8c8;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+#honey-demo .screen-top strong { color: #f4f7fb; font-weight: 650; }
+#honey-demo .screen-top .status { display: flex; gap: 7px; align-items: center; }
+#honey-demo .signal { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px rgba(129,230,168,.85); }
+
+#honey-demo .honey-viewport {
+  position: absolute;
+  inset: 58px 0 54px;
+  overflow: hidden;
+}
+
+#honey-demo .honey-content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 1px;
+}
+
+#honey-demo .honey-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 78px;
+  height: 78px;
+  margin: -39px 0 0 -39px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 0;
+  padding: 0;
+  color: #c8d1db;
+  background: transparent;
+  transition: transform 150ms cubic-bezier(.22,.8,.25,1), opacity 150ms ease, filter 150ms ease;
+  will-change: transform;
+  cursor: pointer;
+}
+
+#honey-demo .honey-icon {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 20px;
+  overflow: hidden;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 7px 20px rgba(0,0,0,.27);
+}
+
+#honey-demo .honey-icon::before {
+  content: "";
+  position: absolute;
+  inset: 1px 1px 48%;
+  border-radius: 18px 18px 12px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.26), transparent);
+  pointer-events: none;
+}
+
+#honey-demo .honey-icon svg {
+  position: relative;
+  z-index: 1;
+  width: 29px;
+  height: 29px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#honey-demo .honey-label { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; line-height: 1; }
+#honey-demo .honey-item.center .honey-icon { border-color: rgba(115,230,255,.9); box-shadow: 0 0 0 3px rgba(115,230,255,.12), 0 0 28px rgba(115,230,255,.30), inset 0 1px 0 rgba(255,255,255,.28); }
+#honey-demo .honey-item.center .honey-label { color: #fff; font-weight: 650; }
+
+#honey-demo .tone-health { background: linear-gradient(145deg, #ee7089, #8b294c); }
+#honey-demo .tone-nes { background: linear-gradient(145deg, #5fe1ac, #16756d); }
+#honey-demo .tone-sport { background: linear-gradient(145deg, #ffc076, #b55734); }
+#honey-demo .tone-timer { background: linear-gradient(145deg, #7bd3ff, #3869ba); }
+#honey-demo .tone-settings { background: linear-gradient(145deg, #aebdca, #435363); }
+#honey-demo .tone-weather { background: linear-gradient(145deg, #b8e5ff, #527fc6); }
+#honey-demo .tone-sleep { background: linear-gradient(145deg, #b5a6f2, #5b478f); }
+#honey-demo .tone-steps { background: linear-gradient(145deg, #82efbd, #398e62); }
+#honey-demo .tone-alarm { background: linear-gradient(145deg, #ff958b, #a43e4b); }
+
+#honey-demo .screen-bottom {
+  position: absolute;
+  z-index: 20;
+  inset: auto 16px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #8394a7;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+#honey-demo .screen-bottom .dot-row { display: flex; gap: 4px; align-items: center; }
+#honey-demo .screen-bottom .dot { width: 4px; height: 4px; border-radius: 50%; background: #647387; }
+#honey-demo .screen-bottom .dot.active { width: 14px; border-radius: 3px; background: var(--cyan); }
+
+#honey-demo .control-panel {
+  min-width: 0;
+  padding: 4px 0;
+}
+
+#honey-demo .control-panel h3 { margin: 0 0 7px; font-size: 16px; }
+#honey-demo .control-panel p { margin: 0 0 18px; color: var(--muted); line-height: 1.55; font-size: 14px; }
+#honey-demo .state-list { display: grid; gap: 9px; margin-bottom: 18px; }
+#honey-demo .state {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid #d9e3ea;
+  border-radius: 10px;
+  background: #f7fafc;
+}
+#honey-demo .state-mark { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 8px; color: #071018; background: var(--cyan); font-size: 12px; font-weight: 800; }
+#honey-demo .state:nth-child(2) .state-mark { background: var(--orange); }
+#honey-demo .state:nth-child(3) .state-mark { background: var(--green); }
+#honey-demo .state-copy { min-width: 0; }
+#honey-demo .state-copy strong { display: block; color: #15202a; font-size: 13px; }
+#honey-demo .state-copy span { display: block; margin-top: 3px; color: #657483; font-size: 12px; }
+
+#honey-demo .choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
+#honey-demo .choice-row button {
+  border: 1px solid rgba(115,230,255,.42);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--cyan);
+  background: rgba(115,230,255,.08);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+#honey-demo .choice-row button:hover { background: rgba(115,230,255,.16); }
+#honey-demo .interaction-readout { min-height: 18px; margin-top: 11px; color: #657483; font-size: 12px; }
+
+@media (max-width: 720px) {
+  #honey-demo .demo-head { align-items: start; flex-direction: column; gap: 9px; }
+  #honey-demo .demo-layout { grid-template-columns: 1fr; }
+  #honey-demo .watch-shell { width: min(390px, 92vw); }
+}
+</style>
+
+<div id="honey-demo">
+  <div class="demo-head">
+    <div>
+      <h2>蜂窝菜单 · 交互预览</h2>
+      <p class="subtitle">按住屏幕拖动，松手观察惯性和吸附；点击任意图标可将它吸附到中心。</p>
+    </div>
+    <div class="demo-badge">390 × 450 · AMOLED</div>
+  </div>
+
+  <div class="demo-layout">
+    <div class="watch-shell">
+      <div class="watch-screen" id="honey-screen" aria-label="蜂窝菜单预览">
+        <div class="screen-glow"></div>
+        <div class="screen-top"><strong id="selected-name">Health</strong><span class="status"><span class="signal"></span>Ready</span></div>
+        <div class="honey-viewport">
+          <div class="honey-content" id="honey-content">
+            <button class="honey-item" data-id="health" data-q="0" data-r="0"><span class="honey-icon tone-health"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 12 2-6h7"/></svg></span><span class="honey-label">Health</span></button>
+            <button class="honey-item" data-id="nes" data-q="1" data-r="0"><span class="honey-icon tone-nes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h10a3 3 0 0 1 2.8 1.9l2 5a2.7 2.7 0 0 1-5 2.1l-.7-1.5H7.9l-.7 1.5a2.7 2.7 0 0 1-5-2.1l2-5A3 3 0 0 1 7 5Z"/><path d="M7 9v4M5 11h4M16 10h.01M18.5 12h.01"/></svg></span><span class="honey-label">NES</span></button>
+            <button class="honey-item" data-id="sport" data-q="0" data-r="-1"><span class="honey-icon tone-sport"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="honey-label">Sport</span></button>
+            <button class="honey-item" data-id="timer" data-q="0" data-r="1"><span class="honey-icon tone-timer"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6M16.5 5.5 19 3"/></svg></span><span class="honey-label">Timer</span></button>
+            <button class="honey-item" data-id="settings" data-q="-1" data-r="1"><span class="honey-icon tone-settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg></span><span class="honey-label">Settings</span></button>
+            <button class="honey-item" data-id="weather" data-q="1" data-r="-1"><span class="honey-icon tone-weather"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span><span class="honey-label">Weather</span></button>
+            <button class="honey-item" data-id="sleep" data-q="-1" data-r="0"><span class="honey-icon tone-sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 0 1 11.2 3 6.7 6.7 0 1 0 21 12.8Z"/><path d="M17 4h4M19 2v4"/></svg></span><span class="honey-label">Sleep</span></button>
+            <button class="honey-item" data-id="steps" data-q="2" data-r="0"><span class="honey-icon tone-steps"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18c3.8 0 6.5-1.7 8.2-5.1L15 9l3 2.2c1.7 1.2 2.8 3 2.8 5.1v1.7H5Z"/><path d="M8 14h.01M11 12h.01M16 14h.01"/></svg></span><span class="honey-label">Steps</span></button>
+            <button class="honey-item" data-id="alarm" data-q="-1" data-r="-1"><span class="honey-icon tone-alarm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4M4 4 2 6M20 4l2 2"/></svg></span><span class="honey-label">Alarm</span></button>
+          </div>
+        </div>
+        <div class="screen-bottom"><span>KEY1 返回 · KEY2 打开</span><span class="dot-row"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></span></div>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <h3>三段式手感</h3>
+      <p>图标随手指移动，速度逐渐衰减，最终由最近图标平滑接管中心位置。中心项始终放大并保留清晰点击区域。</p>
+      <div class="state-list">
+        <div class="state"><span class="state-mark">1</span><div class="state-copy"><strong>静止布局</strong><span>中心项突出，邻居保持规则六边形间距</span></div></div>
+        <div class="state"><span class="state-mark">2</span><div class="state-copy"><strong>拖动跟手</strong><span>二维移动，不锁死方向，适合拇指快速找图标</span></div></div>
+        <div class="state"><span class="state-mark">3</span><div class="state-copy"><strong>惯性吸附</strong><span>松手后减速，最近项吸附到中心并更新标题</span></div></div>
+      </div>
+      <div class="choice-row">
+        <button type="button" data-choice="honeycomb-v1" id="approve-honey">采用这套交互</button>
+        <button type="button" id="reset-honey">重置中心</button>
+      </div>
+      <div class="interaction-readout" id="interaction-readout">当前中心：Health</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const screen = document.getElementById('honey-screen');
+  const content = document.getElementById('honey-content');
+  const items = [...document.querySelectorAll('#honey-demo .honey-item')];
+  const selectedName = document.getElementById('selected-name');
+  const readout = document.getElementById('interaction-readout');
+  const spacingX = 92;
+  const spacingY = 78;
+  let offsetX = 0;
+  let offsetY = 0;
+  let activeId = 'health';
+  let dragging = false;
+  let moved = false;
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let lastX = 0;
+  let lastY = 0;
+  let velocityX = 0;
+  let velocityY = 0;
+  let animation = 0;
+
+  const positionOf = (item) => ({
+    x: Number(item.dataset.q) * spacingX + Number(item.dataset.r) * spacingX / 2,
+    y: Number(item.dataset.r) * spacingY,
+  });
+
+  function render() {
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    items.forEach((item) => {
+      const p = positionOf(item);
+      const x = p.x + offsetX;
+      const y = p.y + offsetY;
+      const distance = Math.hypot(x, y);
+      const scale = 0.76 + Math.max(0, 1 - distance / 155) * 0.27;
+      const opacity = Math.max(0.28, 1 - distance / 310);
+      item.style.transform = `translate(${p.x}px, ${p.y}px) scale(${scale})`;
+      item.style.opacity = opacity;
+      item.style.zIndex = String(1000 - Math.round(distance));
+      item.classList.toggle('center', item.dataset.id === activeId && distance < 16);
+    });
+    const activeItem = items.find((item) => item.dataset.id === activeId);
+    selectedName.textContent = activeItem ? activeItem.querySelector('.honey-label').textContent : activeId;
+    readout.textContent = `当前中心：${selectedName.textContent}`;
+  }
+
+  function hitTest(clientX, clientY) {
+    const rect = screen.getBoundingClientRect();
+    const x = clientX - rect.left - rect.width / 2;
+    const y = clientY - rect.top - (58 + (rect.height - 112) / 2);
+    let best = null;
+    let distance = Infinity;
+    items.forEach((item) => {
+      const p = positionOf(item);
+      const d = Math.hypot(x - (p.x + offsetX), y - (p.y + offsetY));
+      if (d < distance) { distance = d; best = item; }
+    });
+    return distance < 48 ? best : null;
+  }
+
+  function snapTo(item, duration = 260) {
+    cancelAnimationFrame(animation);
+    const p = positionOf(item);
+    content.style.transition = `transform ${duration}ms cubic-bezier(.18,.85,.22,1)`;
+    offsetX = -p.x;
+    offsetY = -p.y;
+    render();
+    window.setTimeout(() => {
+      content.style.transition = '';
+      activeId = item.dataset.id;
+      render();
+    }, duration + 20);
+  }
+
+  function settle() {
+    let frame = 0;
+    const decay = () => {
+      offsetX += velocityX;
+      offsetY += velocityY;
+      velocityX *= 0.90;
+      velocityY *= 0.90;
+      render();
+      frame += 1;
+      if (frame < 42 && Math.hypot(velocityX, velocityY) > 0.35) {
+        animation = requestAnimationFrame(decay);
+        return;
+      }
+      const nearest = items.reduce((best, item) => {
+        const p = positionOf(item);
+        const d = Math.hypot(p.x + offsetX, p.y + offsetY);
+        return d < best.distance ? { item, distance: d } : best;
+      }, { item: items[0], distance: Infinity }).item;
+      snapTo(nearest);
+    };
+    animation = requestAnimationFrame(decay);
+  }
+
+  screen.addEventListener('pointerdown', (event) => {
+    cancelAnimationFrame(animation);
+    content.style.transition = '';
+    dragging = true;
+    moved = false;
+    pointerId = event.pointerId;
+    startX = lastX = event.clientX;
+    startY = lastY = event.clientY;
+    velocityX = velocityY = 0;
+    screen.setPointerCapture(pointerId);
+    screen.classList.add('dragging');
+  });
+
+  screen.addEventListener('pointermove', (event) => {
+    if (!dragging || event.pointerId !== pointerId) return;
+    const dx = event.clientX - lastX;
+    const dy = event.clientY - lastY;
+    if (Math.hypot(event.clientX - startX, event.clientY - startY) > 7) moved = true;
+    offsetX += dx;
+    offsetY += dy;
+    velocityX = velocityX * 0.55 + dx * 0.45;
+    velocityY = velocityY * 0.55 + dy * 0.45;
+    lastX = event.clientX;
+    lastY = event.clientY;
+    render();
+  });
+
+  screen.addEventListener('pointerup', (event) => {
+    if (!dragging || event.pointerId !== pointerId) return;
+    dragging = false;
+    screen.classList.remove('dragging');
+    const tapped = !moved ? hitTest(event.clientX, event.clientY) : null;
+    if (tapped) {
+      velocityX = velocityY = 0;
+      snapTo(tapped, 220);
+    } else {
+      settle();
+    }
+  });
+
+  screen.addEventListener('pointercancel', () => {
+    dragging = false;
+    screen.classList.remove('dragging');
+    settle();
+  });
+
+  document.getElementById('reset-honey').addEventListener('click', () => {
+    velocityX = velocityY = 0;
+    snapTo(document.querySelector('[data-id="health"]'), 220);
+  });
+
+  document.getElementById('approve-honey').addEventListener('click', () => {
+    readout.textContent = '已记录：蜂窝菜单 v1';
+    if (window.brainstorm) window.brainstorm.choice('honeycomb-v1', { selectedCenter: activeId });
+  });
+
+  render();
+})();
+</script>

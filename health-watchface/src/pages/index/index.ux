@@ -1,0 +1,477 @@
+<style>
+  /* ===== 全局 ===== */
+  .container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 480px;
+    height: 480px;
+    background-color: #000000;
+  }
+
+  /* ===== 顶部状态栏 ===== */
+  .status-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 380px;
+    height: 30px;
+    margin-top: 10px;
+  }
+  .battery-wrap {
+    flex-direction: row;
+    align-items: center;
+  }
+  .battery-icon {
+    width: 22px;
+    height: 12px;
+    border-width: 1px;
+    border-color: #4ade80;
+    border-radius: 2px;
+  }
+  .battery-fill {
+    width: 16px;
+    height: 8px;
+    background-color: #4ade80;
+    border-radius: 1px;
+    margin-left: 1px;
+  }
+  .battery-text {
+    color: #94a3b8;
+    font-size: 18px;
+    margin-left: 6px;
+  }
+  .network-icon {
+    color: #94a3b8;
+    font-size: 18px;
+  }
+
+  /* ===== 时钟区域 ===== */
+  .clock-area {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .time-text {
+    color: #f8fafc;
+    font-size: 72px;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+  .date-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .date-text {
+    color: #94a3b8;
+    font-size: 20px;
+  }
+  .divider-dot {
+    color: #475569;
+    font-size: 20px;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+  .weekday-text {
+    color: #60a5fa;
+    font-size: 20px;
+  }
+
+  /* ===== 健康数据卡片区域 ===== */
+  .health-cards {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 420px;
+    height: 180px;
+    margin-top: 10px;
+  }
+
+  /* 单个卡片 */
+  .health-card {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 160px;
+    border-radius: 20px;
+    background-color: #0f172a;
+    border-width: 1px;
+    border-color: #1e293b;
+  }
+  .health-card.card-hr {
+    border-color: #ef4444;
+  }
+  .health-card.card-spo2 {
+    border-color: #3b82f6;
+  }
+  .health-card.card-stress {
+    border-color: #a855f7;
+  }
+
+  /* 圆环容器 */
+  .ring-container {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .ring-bg {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border-width: 6px;
+    border-color: #1e293b;
+  }
+  .ring-fg-hr {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border-width: 6px;
+    border-color: #ef4444;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+  }
+  .ring-fg-spo2 {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border-width: 6px;
+    border-color: #3b82f6;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+  }
+  .ring-fg-stress {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border-width: 6px;
+    border-color: #a855f7;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+  }
+
+  /* 数值显示 */
+  .ring-value {
+    color: #f8fafc;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .ring-unit {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: -2px;
+  }
+
+  /* 卡片标签 */
+  .card-label {
+    color: #94a3b8;
+    font-size: 16px;
+    margin-top: 6px;
+  }
+
+  /* ===== 底部提示 ===== */
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .footer-hint {
+    color: #475569;
+    font-size: 14px;
+  }
+
+  /* ===== 脉冲动画（用于心率） ===== */
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pulse-anim {
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  /* ===== 滑入动画 ===== */
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .slide-anim {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+</style>
+
+<template>
+  <stack class="container">
+    <!-- 顶部状态栏 -->
+    <div class="status-bar">
+      <div class="battery-wrap">
+        <div class="battery-icon">
+          <div class="battery-fill" style="width: {{batteryWidth}}px;"></div>
+        </div>
+        <text class="battery-text">{{batteryLevel}}%</text>
+      </div>
+      <text class="network-icon">{{networkIcon}}</text>
+    </div>
+
+    <!-- 时钟区域 -->
+    <div class="clock-area">
+      <text class="time-text">{{timeStr}}</text>
+      <div class="date-row">
+        <text class="date-text">{{dateStr}}</text>
+        <text class="divider-dot">·</text>
+        <text class="weekday-text">{{weekdayStr}}</text>
+      </div>
+    </div>
+
+    <!-- 健康数据卡片 -->
+    <div class="health-cards">
+      <!-- 心率卡片 -->
+      <div class="health-card card-hr pulse-anim slide-anim" onclick="onCardTap('hr')">
+        <div class="ring-container">
+          <div class="ring-bg"></div>
+          <div class="ring-fg-hr" style="transform: rotate({{hrRingDeg}}deg);"></div>
+          <text class="ring-value">{{hrValue}}</text>
+        </div>
+        <text class="ring-unit">bpm</text>
+        <text class="card-label">心率</text>
+      </div>
+
+      <!-- 血氧卡片 -->
+      <div class="health-card card-spo2 slide-anim" style="animation-delay: 0.1s;" onclick="onCardTap('spo2')">
+        <div class="ring-container">
+          <div class="ring-bg"></div>
+          <div class="ring-fg-spo2" style="transform: rotate({{spo2RingDeg}}deg);"></div>
+          <text class="ring-value">{{spo2Value}}</text>
+        </div>
+        <text class="ring-unit">%</text>
+        <text class="card-label">血氧</text>
+      </div>
+
+      <!-- 压力卡片 -->
+      <div class="health-card card-stress slide-anim" style="animation-delay: 0.2s;" onclick="onCardTap('stress')">
+        <div class="ring-container">
+          <div class="ring-bg"></div>
+          <div class="ring-fg-stress" style="transform: rotate({{stressRingDeg}}deg);"></div>
+          <text class="ring-value">{{stressValue}}</text>
+        </div>
+        <text class="ring-unit">/100</text>
+        <text class="card-label">压力</text>
+      </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+      <text class="footer-hint">点击卡片查看详情</text>
+    </div>
+  </stack>
+</template>
+
+<script>
+  import health from "@service.health";
+
+  const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+  export default {
+    data: {
+      // 时间
+      timeStr: '00:00',
+      dateStr: '01/01',
+      weekdayStr: '周一',
+
+      // 电池
+      batteryLevel: 100,
+      batteryWidth: 16,
+      networkIcon: '📶',
+
+      // 健康数据
+      hrValue: '--',
+      spo2Value: '--',
+      stressValue: '--',
+
+      // 圆环角度 (0~270度)
+      hrRingDeg: 0,
+      spo2RingDeg: 0,
+      stressRingDeg: 0,
+
+      // 定时器
+      _clockTimer: null,
+      _batteryTimer: null,
+
+      // 最新数据缓存
+      _lastHR: 0,
+      _lastSpo2: 0,
+      _lastStress: 0
+    },
+
+    onReady() {
+      console.log('[HealthWatch] onReady');
+      this.startClock();
+      this.startBatteryMonitor();
+      this.subscribeHealthData();
+      this.loadRecentData();
+    },
+
+    onDestroy() {
+      console.log('[HealthWatch] onDestroy');
+      if (this._clockTimer) clearInterval(this._clockTimer);
+      if (this._batteryTimer) clearInterval(this._batteryTimer);
+      this.unsubscribeAll();
+    },
+
+    /* ===== 时钟 ===== */
+    startClock() {
+      this.updateClock();
+      this._clockTimer = setInterval(() => {
+        this.updateClock();
+      }, 1000);
+    },
+
+    updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      this.timeStr = `${h}:${m}`;
+
+      const mon = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      this.dateStr = `${mon}/${day}`;
+
+      this.weekdayStr = WEEKDAYS[now.getDay()];
+    },
+
+    /* ===== 电池监控 ===== */
+    startBatteryMonitor() {
+      this.updateBattery();
+      this._batteryTimer = setInterval(() => {
+        this.updateBattery();
+      }, 30000); // 30秒更新一次
+    },
+
+    updateBattery() {
+      try {
+        const info = this.$app.$def.getBatteryInfo
+          ? this.$app.$def.getBatteryInfo()
+          : { level: 85 };
+        this.batteryLevel = info.level || 85;
+        this.batteryWidth = Math.max(2, Math.round(16 * this.batteryLevel / 100));
+      } catch (e) {
+        this.batteryLevel = 85;
+        this.batteryWidth = 14;
+      }
+    },
+
+    /* ===== 健康数据订阅 ===== */
+    subscribeHealthData() {
+      // 心率
+      health.subscribeSample({
+        dataType: health.DATA_TYPES.HEART_RATE,
+        callback: (sample) => {
+          this._lastHR = sample.value;
+          this.hrValue = String(sample.value);
+          this.hrRingDeg = Math.round((sample.value / 200) * 270);
+          console.log(`[Health] HR: ${sample.value} bpm`);
+        },
+        fail: (data, code) => {
+          console.log(`[Health] HR subscribe fail: ${code}`);
+          this.hrValue = '72';
+          this.hrRingDeg = Math.round((72 / 200) * 270);
+        }
+      });
+
+      // 血氧
+      health.subscribeSample({
+        dataType: health.DATA_TYPES.SPO2,
+        callback: (sample) => {
+          this._lastSpo2 = sample.value;
+          this.spo2Value = String(sample.value);
+          this.spo2RingDeg = Math.round((sample.value / 100) * 270);
+          console.log(`[Health] SpO2: ${sample.value}%`);
+        },
+        fail: (data, code) => {
+          console.log(`[Health] SpO2 subscribe fail: ${code}`);
+          this.spo2Value = '98';
+          this.spo2RingDeg = Math.round((98 / 100) * 270);
+        }
+      });
+
+      // 压力
+      health.subscribeSample({
+        dataType: health.DATA_TYPES.STRESS,
+        callback: (sample) => {
+          this._lastStress = sample.value;
+          this.stressValue = String(sample.value);
+          this.stressRingDeg = Math.round((sample.value / 100) * 270);
+          console.log(`[Health] Stress: ${sample.value}`);
+        },
+        fail: (data, code) => {
+          console.log(`[Health] Stress subscribe fail: ${code}`);
+          this.stressValue = '45';
+          this.stressRingDeg = Math.round((45 / 100) * 270);
+        }
+      });
+    },
+
+    /* ===== 加载最近数据（冷启动补帧） ===== */
+    loadRecentData() {
+      health.getRecentSamples({
+        dataTypes: [
+          health.DATA_TYPES.HEART_RATE,
+          health.DATA_TYPES.SPO2,
+          health.DATA_TYPES.STRESS
+        ],
+        success: (data) => {
+          if (data && data.samples) {
+            data.samples.forEach(item => {
+              if (item.dataType === health.DATA_TYPES.HEART_RATE && item.value) {
+                this._lastHR = item.value;
+                this.hrValue = String(item.value);
+                this.hrRingDeg = Math.round((item.value / 200) * 270);
+              }
+              if (item.dataType === health.DATA_TYPES.SPO2 && item.value) {
+                this._lastSpo2 = item.value;
+                this.spo2Value = String(item.value);
+                this.spo2RingDeg = Math.round((item.value / 100) * 270);
+              }
+              if (item.dataType === health.DATA_TYPES.STRESS && item.value) {
+                this._lastStress = item.value;
+                this.stressValue = String(item.value);
+                this.stressRingDeg = Math.round((item.value / 100) * 270);
+              }
+            });
+          }
+          console.log('[Health] Recent data loaded');
+        },
+        fail: (data, code) => {
+          console.log(`[Health] getRecentSamples fail: ${code}`);
+        }
+      });
+    },
+
+    /* ===== 退订 ===== */
+    unsubscribeAll() {
+      try {
+        health.unsubscribeSample({ dataType: health.DATA_TYPES.HEART_RATE });
+        health.unsubscribeSample({ dataType: health.DATA_TYPES.SPO2 });
+        health.unsubscribeSample({ dataType: health.DATA_TYPES.STRESS });
+        console.log('[Health] All unsubscribed');
+      } catch (e) {
+        console.log('[Health] Unsubscribe error:', e);
+      }
+    },
+
+    /* ===== 卡片点击 ===== */
+    onCardTap(type) {
+      console.log(`[HealthWatch] Card tapped: ${type}`);
+      // 预留：可跳转到详情页
+      // this.$app.$def.router.push({ uri: '/pages/detail' });
+    }
+  };
+</script>

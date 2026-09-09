@@ -1,6 +1,6 @@
 from pathlib import Path
 import struct
-p=Path(r'watchface_app/assets')
+p=Path(r'app/watchface_app/assets')
 def rle(data, blk=2):
     n=len(data)//blk
     out=bytearray(); i=0

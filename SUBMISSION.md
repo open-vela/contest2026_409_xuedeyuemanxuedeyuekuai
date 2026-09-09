@@ -27,8 +27,8 @@
 | 项目 | 内容 |
 |------|------|
 | 作品名称 | Huangshan WatchFace - 黄山派智能手表多表盘系统 |
-| 队伍名称 | （请填写你的队伍名称） |
-| 团队分工 | （请填写各成员姓名与承担的工作） |
+| 队伍名称 | 学得越慢学得越快 |
+| 团队分工 | XUMUYIE：产品设计、系统开发、硬件适配、测试与文档 |
 | 选题方向 | ✅ 手表应用创新 |
 
 ### AI 开发数据
@@ -176,7 +176,7 @@
 **软件/固件架构：**
 
 `
-watchface_app/
+app/watchface_app/
 ├── src/
 │   ├── watchface_main.c      # 主程序（2236行）
 │   │   ├── build_dial_face()      # 经典表盘构建
@@ -299,7 +299,7 @@ watchface_app/
 **自动化测试结果：**
 
 `
-$ python -m unittest discover -s watchface_app/tests -v
+$ python -m unittest discover -s app/watchface_app/tests -v
 
 test_watchface_contract.py (19 tests) ............... OK
 test_honeycomb_contract.py (9 tests) ................ OK

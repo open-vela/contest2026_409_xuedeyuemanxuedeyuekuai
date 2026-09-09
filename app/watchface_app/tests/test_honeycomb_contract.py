@@ -84,7 +84,7 @@ class HoneycombContractTests(unittest.TestCase):
         self.assertNotIn("SF32LB52_BUTTON_LONG_RESET_MS", board_buttons)
 
     def test_build_script_syncs_board_button_policy(self):
-        script = (ROOT.parent / "build_watchface.sh").read_text(encoding="utf-8")
+        script = (ROOT.parent.parent / "build_watchface.sh").read_text(encoding="utf-8")
         self.assertIn("sf32lb52_buttons.c", script)
         self.assertIn("$APP_SRC/src/sf32lb52_buttons.c", script)
 

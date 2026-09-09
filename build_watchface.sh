@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_SRC="/mnt/c/Users/21561/Desktop/比赛/watchface_app"
+APP_SRC="/mnt/c/Users/21561/Desktop/比赛/app/watchface_app"
 APP_DST=/home/nuttx-apps/examples/watchface
 VENDOR_BOARD=/home/vendor/sifli/boards/sf32lb52/lckfb_huangshan_pi
 DEFCONFIG=$VENDOR_BOARD/configs/nsh/defconfig

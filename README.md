@@ -21,7 +21,7 @@
 
 ```
 ├── app/
-│   └── watchface_app/          # 主要应用代码
+│   └── watchface_app/          # 主要应用代码（通过 manifest 映射）
 │       ├── src/                # C 源代码
 │       │   ├── watchface_main.c    # 主程序
 │       │   ├── honeycomb_model.c   # 蜂窝菜单模型

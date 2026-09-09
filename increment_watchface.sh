@@ -1,5 +1,5 @@
 set -e
-APP_SRC=/mnt/c/Users/21561/Desktop/比赛/watchface_app
+APP_SRC=/mnt/c/Users/21561/Desktop/比赛/app/watchface_app
 APP_DST=/home/nuttx-apps/examples/watchface
 cp "$APP_SRC/assets/wf_data.c" "$APP_DST/assets/wf_data.c"
 cp "$APP_SRC/src/watchface_main.c" "$APP_DST/src/watchface_main.c"

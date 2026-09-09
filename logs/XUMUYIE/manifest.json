@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "team_id": "contest2026_409_xuedeyuemanxuedeyuekuai",
+  "github_login": "XUMUYIE",
+  "generator": "codex",
+  "sessions": [
+    {
+      "session_id": "01a080e7-727d-7fe1-b782-3f1e60787eb0",
+      "tool": "codex",
+      "started_at": "2026-09-08T20:04:07.000Z",
+      "last_event_at": "2026-09-09T08:33:13.000Z",
+      "event_count": 150,
+      "file_path": "logs/XUMUYIE/2026-09-08/codex__01a080e7-727d-7fe1-b782-3f1e60787eb0.jsonl",
+      "collection_mode": "cli",
+      "health": "ok"
+    }
+  ],
+  "updated_at": "2026-09-09T08:54:00.000+08:00"
+}
